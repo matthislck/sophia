@@ -1,0 +1,77 @@
+/* ============================================
+   Matthis Design System — tokens.css
+   Copy this file into every project.
+   Never hardcode colors, spacing, or radius.
+   ============================================ */
+
+:root {
+  /* --- Color: Surfaces --- */
+  --m-bg:          #0c0c0c;   /* page background */
+  --m-surface:     #141414;   /* sidebar, panels */
+  --m-raised:      #1c1c1c;   /* cards, inputs */
+  --m-hover:       #232323;   /* hover state */
+  --m-active:      #2a2a2a;   /* active / pressed */
+
+  /* --- Color: Borders --- */
+  --m-border:      #2a2a2a;   /* default border */
+  --m-border-2:    #363636;   /* emphasis border */
+
+  /* --- Color: Text --- */
+  --m-text:        #e8e8e8;   /* primary text */
+  --m-muted:       #6b6b6b;   /* secondary text, labels */
+  --m-hint:        #444444;   /* placeholder text */
+
+  /* --- Color: Accent (the one brand color) --- */
+  --m-accent:      #5b8fff;
+  --m-accent-hover:#4a7eee;
+  --m-accent-bg:   rgba(91, 143, 255, 0.10);
+
+  /* --- Color: Semantic --- */
+  --m-success:     #4caf7d;
+  --m-success-bg:  rgba(76, 175, 125, 0.12);
+  --m-danger:      #e05252;
+  --m-danger-bg:   rgba(224, 82, 82, 0.12);
+  --m-warn:        #e09a38;
+  --m-warn-bg:     rgba(224, 154, 56, 0.12);
+
+  /* --- Typography --- */
+  --m-font:        'Inter', system-ui, -apple-system, sans-serif;
+  --m-font-mono:   'JetBrains Mono', 'Fira Code', monospace;
+
+  --m-text-xs:     11px;
+  --m-text-sm:     12px;
+  --m-text-base:   13px;
+  --m-text-md:     14px;
+  --m-text-lg:     18px;
+  --m-text-xl:     24px;
+  --m-text-display:32px;
+
+  /* --- Spacing (4px base grid) --- */
+  --m-space-1:     4px;
+  --m-space-2:     8px;
+  --m-space-3:     12px;
+  --m-space-4:     16px;
+  --m-space-6:     24px;
+  --m-space-8:     32px;
+  --m-space-12:    48px;
+
+  /* --- Radius --- */
+  --m-radius-sm:   4px;
+  --m-radius-md:   8px;
+  --m-radius-lg:   10px;
+  --m-radius-pill: 9999px;
+
+  /* --- Glass (backdrop-filter, needs content behind) --- */
+  --m-glass:           rgba(255, 255, 255, 0.04);  /* subtle */
+  --m-glass-strong:    rgba(255, 255, 255, 0.07);  /* strong */
+  --m-glass-tinted:    rgba(91, 143, 255, 0.08);   /* accent tint */
+  --m-glass-border:    rgba(255, 255, 255, 0.10);
+  --m-glass-border-2:  rgba(255, 255, 255, 0.14);
+  --m-glass-blur:      blur(16px);
+  --m-glass-blur-sm:   blur(12px);
+  --m-glass-blur-lg:   blur(24px);
+
+  /* --- Motion --- */
+  --m-ease:        120ms ease;
+  --m-ease-slow:   220ms ease;
+}
