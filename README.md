@@ -71,7 +71,7 @@ sophia/
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/sophia.git
+git clone https://github.com/matthislck/sophia.git
 cd sophia
 
 # 2. Create a .env file (see .env.example for all options)
