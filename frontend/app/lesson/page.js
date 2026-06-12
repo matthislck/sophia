@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { CheckCircle2, XCircle, Lightbulb, Code2, Loader2, AlertCircle, ArrowLeft } from 'lucide-react'
+import { CheckCircle2, XCircle, Lightbulb, Code2, Loader2, AlertCircle, ArrowLeft, Cpu } from 'lucide-react'
 import { Button, Card, Heading, Muted, Badge, Divider, Input } from '@/components/ui'
 
 export default function LessonPage() {
@@ -10,13 +10,17 @@ export default function LessonPage() {
   const router = useRouter()
   const topic = searchParams.get('topic') || ''
   const nodeTitle = searchParams.get('node') || ''
+  const provider = searchParams.get('provider') || ''
 
-  // Store topic in sessionStorage so sidebar navigation can pick it up
+  // Store topic and provider in sessionStorage so sidebar navigation can pick them up
   useEffect(() => {
     if (topic) {
       sessionStorage.setItem('sophia_topic', topic)
     }
-  }, [topic])
+    if (provider) {
+      sessionStorage.setItem('sophia_provider', provider)
+    }
+  }, [topic, provider])
 
   const [lesson, setLesson] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -58,9 +62,12 @@ export default function LessonPage() {
       setLoading(true)
       setError(null)
       try {
-        const res = await fetch(
-          `http://localhost:8000/api/lesson?topic=${encodeURIComponent(topic)}&node_title=${encodeURIComponent(nodeTitle)}`
-        )
+        let url = `http://localhost:8000/api/lesson?topic=${encodeURIComponent(topic)}&node_title=${encodeURIComponent(nodeTitle)}`
+        if (provider) {
+          url += `&provider=${provider}`
+        }
+
+        const res = await fetch(url)
         if (!res.ok) {
           throw new Error(`Server-Fehler: ${res.status}`)
         }
@@ -78,7 +85,7 @@ export default function LessonPage() {
     }
 
     fetchLesson()
-  }, [topic, nodeTitle])
+  }, [topic, nodeTitle, provider])
 
   const handleSubmit = async () => {
     setSubmitted(true)
@@ -86,14 +93,19 @@ export default function LessonPage() {
     setFeedback('')
 
     try {
+      const body = {
+        topic,
+        node_title: nodeTitle,
+        user_answer: answer,
+      }
+      if (provider) {
+        body.provider = provider
+      }
+
       const res = await fetch('http://localhost:8000/api/evaluate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          topic,
-          node_title: nodeTitle,
-          user_answer: answer,
-        }),
+        body: JSON.stringify(body),
       })
       if (!res.ok) throw new Error('Fehler bei der Bewertung')
       const data = await res.json()
@@ -117,7 +129,9 @@ export default function LessonPage() {
 
   const goBackToSkillTree = () => {
     if (topic) {
-      router.push(`/skilltree?topic=${encodeURIComponent(topic)}`)
+      let url = `/skilltree?topic=${encodeURIComponent(topic)}`
+      if (provider) url += `&provider=${provider}`
+      router.push(url)
     } else {
       router.push('/')
     }
@@ -185,7 +199,20 @@ export default function LessonPage() {
               Zurück
             </Button>
           </div>
-          <Badge variant="accent" dot>{nodeTitle}</Badge>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--m-space-2)' }}>
+            <Badge variant="accent" dot>{nodeTitle}</Badge>
+            {provider && (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: '4px',
+                padding: '2px 8px', borderRadius: 'var(--m-radius-pill)',
+                fontSize: 'var(--m-text-xs)', fontWeight: 500,
+                background: 'var(--m-accent-bg)', color: 'var(--m-accent)',
+              }}>
+                <Cpu size={10} />
+                {provider}
+              </span>
+            )}
+          </div>
           <Muted style={{ marginTop: 'var(--m-space-1)', display: 'block' }}>
             Thema: {topic}
           </Muted>

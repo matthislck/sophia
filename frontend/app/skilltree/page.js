@@ -13,7 +13,7 @@ import {
 } from 'reactflow'
 import 'reactflow/dist/style.css'
 import { Heading, Muted, Card, Button } from '@/components/ui'
-import { Loader2, AlertCircle } from 'lucide-react'
+import { Loader2, AlertCircle, Cpu } from 'lucide-react'
 
 // Custom node component using design system tokens
 function SkillNode({ data }) {
@@ -122,13 +122,17 @@ export default function SkillTreePage() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const topic = searchParams.get('topic') || ''
+  const provider = searchParams.get('provider') || ''
 
-  // Store topic in sessionStorage so sidebar navigation can pick it up
+  // Store topic and provider in sessionStorage so sidebar navigation can pick them up
   useEffect(() => {
     if (topic) {
       sessionStorage.setItem('sophia_topic', topic)
     }
-  }, [topic])
+    if (provider) {
+      sessionStorage.setItem('sophia_provider', provider)
+    }
+  }, [topic, provider])
 
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
@@ -168,10 +172,15 @@ export default function SkillTreePage() {
       setLoading(true)
       setError(null)
       try {
+        const body = { topic }
+        if (provider) {
+          body.provider = provider
+        }
+
         const res = await fetch('http://localhost:8000/api/generate-skilltree', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ topic }),
+          body: JSON.stringify(body),
         })
         if (!res.ok) {
           throw new Error(`Server-Fehler: ${res.status}`)
@@ -197,7 +206,7 @@ export default function SkillTreePage() {
     }
 
     fetchSkillTree()
-  }, [topic, setNodes, setEdges])
+  }, [topic, provider, setNodes, setEdges])
 
   const onConnect = useCallback(
     (params) => setEdges((eds) => [...eds, { ...params, markerEnd: { type: MarkerType.ArrowClosed } }]),
@@ -205,8 +214,11 @@ export default function SkillTreePage() {
   )
 
   const onNodeClick = useCallback((event, node) => {
-    router.push(`/lesson?topic=${encodeURIComponent(topic)}&node=${encodeURIComponent(node.data.label)}`)
-  }, [router, topic])
+    const p = provider || sessionStorage.getItem('sophia_provider') || ''
+    let url = `/lesson?topic=${encodeURIComponent(topic)}&node=${encodeURIComponent(node.data.label)}`
+    if (p) url += `&provider=${p}`
+    router.push(url)
+  }, [router, topic, provider])
 
   return (
     <div className="animate-fade-in" style={{
@@ -217,7 +229,20 @@ export default function SkillTreePage() {
     }}>
       {/* Header */}
       <div style={{ marginBottom: 'var(--m-space-6)' }}>
-        <Heading level={2}>{topic || 'Skill-Tree'}</Heading>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--m-space-3)' }}>
+          <Heading level={2}>{topic || 'Skill-Tree'}</Heading>
+          {provider && (
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: '4px',
+              padding: '2px 8px', borderRadius: 'var(--m-radius-pill)',
+              fontSize: 'var(--m-text-xs)', fontWeight: 500,
+              background: 'var(--m-accent-bg)', color: 'var(--m-accent)',
+            }}>
+              <Cpu size={10} />
+              {provider}
+            </span>
+          )}
+        </div>
         <Muted>Skill-Tree — Klicke auf einen Knoten, um eine Lektion zu starten</Muted>
       </div>
 

@@ -95,13 +95,14 @@ def list_topics() -> list:
     return result
 
 
-def create_topic(topic_name: str) -> dict:
+def create_topic(topic_name: str, provider: str | None = None) -> dict:
     """
     Create a new topic: generate its skill tree, persist it, and add an entry
     to topics.json.
 
     Args:
         topic_name: The human-readable name of the topic.
+        provider: Optional AI provider name (deepseek, openai, anthropic, gemini).
 
     Returns:
         The newly created topic object (including the loaded skill tree).
@@ -117,7 +118,7 @@ def create_topic(topic_name: str) -> dict:
         raise ValueError(f"Topic '{topic_name}' already exists (id: {topic_id}).")
 
     # Generate the skill tree – this also saves it to disk
-    skill_tree, _filename = generate_skill_tree(topic_name)
+    skill_tree, _filename = generate_skill_tree(topic_name, provider=provider)
 
     # Build progress dict from the skill tree nodes
     nodes = skill_tree.get("nodes", [])

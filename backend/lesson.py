@@ -19,13 +19,14 @@ USER_PROMPT_TEMPLATE = (
 )
 
 
-def generate_lesson(topic: str, node_title: str) -> dict:
+def generate_lesson(topic: str, node_title: str, provider: str | None = None) -> dict:
     """
     Generate a learning unit for a specific concept within a topic.
 
     Args:
         topic: The overall topic.
         node_title: The title of the specific concept to teach.
+        provider: Optional provider name (deepseek, openai, anthropic, gemini).
 
     Returns:
         A dictionary with keys "explanation", "code", and "question".
@@ -34,7 +35,7 @@ def generate_lesson(topic: str, node_title: str) -> dict:
         ValueError: If the response cannot be parsed as valid JSON.
     """
     prompt = USER_PROMPT_TEMPLATE.format(topic=topic, node_title=node_title)
-    raw = sophia_ask(prompt, system=SYSTEM_PROMPT, temperature=0.3)
+    raw = sophia_ask(prompt, system=SYSTEM_PROMPT, temperature=0.3, provider=provider)
 
     # Remove markdown code blocks if present
     cleaned = re.sub(r"```(?:json)?\s*", "", raw).strip()

@@ -38,14 +38,17 @@ app.add_middleware(
 
 class SkillTreeRequest(BaseModel):
     topic: str
+    provider: str | None = None  # optional: deepseek, openai, anthropic, gemini
 
 class EvaluateRequest(BaseModel):
     topic: str
     node_title: str
     user_answer: str
+    provider: str | None = None  # optional
 
 class CreateTopicRequest(BaseModel):
     topic: str
+    provider: str | None = None  # optional
 
 class UpdateProgressRequest(BaseModel):
     node_id: str
@@ -66,7 +69,7 @@ def generate_skilltree_endpoint(req: SkillTreeRequest):
     Generate a skill tree for the given topic.
     Returns the skill-tree JSON (dict with a "nodes" key).
     """
-    data, _filename = generate_skill_tree(req.topic)
+    data, _filename = generate_skill_tree(req.topic, provider=req.provider)
     return data
 
 
@@ -74,12 +77,13 @@ def generate_skilltree_endpoint(req: SkillTreeRequest):
 def lesson_endpoint(
     topic: str = Query(..., description="The overall topic"),
     node_title: str = Query(..., description="The specific concept to teach"),
+    provider: str | None = Query(None, description="AI provider to use"),
 ):
     """
     Generate a learning unit for a specific concept within a topic.
     Returns a JSON object with keys "explanation", "code", and "question".
     """
-    data = generate_lesson(topic, node_title)
+    data = generate_lesson(topic, node_title, provider=provider)
     return data
 
 
@@ -96,7 +100,7 @@ def evaluate_endpoint(req: EvaluateRequest):
         "Evaluate the answer. Provide constructive feedback, point out any "
         "misunderstandings, and suggest improvements. Keep it concise (2-4 sentences)."
     )
-    feedback = sophia_ask(prompt, temperature=0.3)
+    feedback = sophia_ask(prompt, temperature=0.3, provider=req.provider)
     return {"feedback": feedback}
 
 
@@ -117,7 +121,7 @@ def api_create_topic(req: CreateTopicRequest):
     Returns 409 if the topic already exists.
     """
     try:
-        result = create_topic(req.topic)
+        result = create_topic(req.topic, provider=req.provider)
         return result
     except ValueError as e:
         raise HTTPException(status_code=409, detail=str(e))

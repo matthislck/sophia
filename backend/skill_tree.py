@@ -19,12 +19,13 @@ USER_PROMPT_TEMPLATE = (
 )
 
 
-def generate_skill_tree(topic: str) -> tuple:
+def generate_skill_tree(topic: str, provider: str | None = None) -> tuple:
     """
-    Generate a skill tree for the given topic using the DeepSeek API.
+    Generate a skill tree for the given topic using the configured AI provider.
 
     Args:
         topic: The topic to generate a skill tree for.
+        provider: Optional provider name (deepseek, openai, anthropic, gemini).
 
     Returns:
         A tuple (dict, str) where the dict has a "nodes" key containing the
@@ -34,7 +35,7 @@ def generate_skill_tree(topic: str) -> tuple:
         ValueError: If the response cannot be parsed as valid JSON.
     """
     prompt = USER_PROMPT_TEMPLATE.format(topic=topic)
-    raw = sophia_ask(prompt, system=SYSTEM_PROMPT, temperature=0.3)
+    raw = sophia_ask(prompt, system=SYSTEM_PROMPT, temperature=0.3, provider=provider)
 
     # Remove markdown code blocks if present
     cleaned = re.sub(r"```(?:json)?\s*", "", raw).strip()
